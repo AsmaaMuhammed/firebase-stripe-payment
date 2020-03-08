@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "Stripe": "pidgeco-pidge2"
+  },
+  "targets": {
+    "pidgeco-pidge2": {
+      "hosting": {
+        "stripe": [
+          "test-payment-using-stripe"
+        ]
+      }
+    }
+  }
+}

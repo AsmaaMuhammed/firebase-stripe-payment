@@ -23,6 +23,21 @@ const {Logging} = require('@google-cloud/logging');//const logging = require('@g
 const token = functions.config().stripe.token;
 const currency = functions.config().stripe.currency || 'USD';
 const stripe = require('stripe')(token);
+
+//////////////////
+exports.autoId = functions.https.onCall((data, context) => {
+     admin.firestore.collection("cities").add({
+      name: "Tokyo",
+      country: "Japan"
+    })
+    .then(function(docRef) {
+        console.log("Document written with ID: ", docRef.id);
+    })
+    .catch(function(error) {
+        console.error("Error adding document: ", error);
+    });
+});
+/////////////////
 exports.token = functions.https.onRequest((req, res) => {
   console.log(token);
   res.send(token);
@@ -58,7 +73,6 @@ exports.createStripeCharge = functions.firestore.document('stripe_customers/{use
 // [END chargecustomer]]
 // When a user is created, register them with Stripe
 exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
-  console.log(token);
   const customer = await stripe.customers.create({email: user.email});
   console.log(customer);
   return admin.firestore().collection('stripe_customers').doc(user.uid).set({customer_id: customer.id});
@@ -66,6 +80,20 @@ exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
 
 // Add a payment source (card) for a user by writing a stripe payment source token to Cloud Firestore
 exports.addPaymentSource = functions.firestore.document('/stripe_customers/{userId}/tokens/{pushId}').onCreate(async (snap, context) => {
+  // const docRef = await admin.firestore().collection("cities").add({
+  //   name: "Tokyo",
+  //   country: "Japan"
+  // });
+  // const docRef = await admin.firestore().collection("cities").doc();
+  // var dd = {
+  //   name: "Tokyo",
+  //   country: "Japan"
+  // };
+  // docRef.set(dd);
+  // console.log("Document written with ID: ", docRef.id);
+  // const docRef = await admin.firestore().collection("cities").doc(docRef.id).get();
+  // console.log("Document written with ID: ", docRef.name);
+  
   const source = snap.data();
   const token = source.token;
   if (source === null){
@@ -102,7 +130,7 @@ function reportError(err, context = {}) {
   // entry. This name can be any valid log stream name, but must contain "err"
   // in order for the error to be picked up by StackDriver Error Reporting.
    // Creates a client
-  const logging = new Logging(`${process.env.GCLOUD_PROJECT}`);
+  const logging = new Logging(process.env.GCLOUD_PROJECT);
   const logName = 'errors';
   const log = logging.log(logName);
 

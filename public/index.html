@@ -15,6 +15,7 @@
         <div v-if="currentUser">
           <h2>Hello {{ currentUser.email }},</h2>
           <button v-on:click="signOut">Sign out</button>
+          <!-- <button onClick="autoId()"> Auto Id </button> -->
           <div v-if="stripeCustomerInitialized">
             <h3>Credit Cards</h3>
             <ul>
@@ -111,7 +112,12 @@
 
     <!-- Import Firebase UI -->
     <script src="https://www.gstatic.com/firebasejs/ui/4.4.0/firebase-ui-auth.js"></script>
-
+    <script>
+      function autoId()
+      {
+        var fullName = firebase.functions().httpsCallable('autoId');
+      }
+    </script>
     <script>
       Stripe.setPublishableKey('pk_test_AYXeqYdpREUXPfKSV5eeiHGs00UFHgUrag');
       var firebaseUI = new firebaseui.auth.AuthUI(firebase.auth());
@@ -222,7 +228,7 @@
           },
           signOut: function() {
             firebase.auth().signOut()
-          }
+          },
         }
       });
     </script>
